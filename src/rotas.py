@@ -17,7 +17,7 @@ class _Snapshot(TypedDict):
     date: date
     user_list: list[str]
 
-def get_on_call_between(
+def get_rota_between(
     start_date: date,
     end_date: date,
     rota_id: int
