@@ -1,5 +1,7 @@
 from datetime import date, timedelta
 from .interval import Interval
+from .util.date_util import add_week, get_first_monday_before_date, get_next_sunday_after_date
+from .util.list_util import get_at_index_with_wrap
 from typing import TypedDict, TypeVar
 import duckdb as db
 import pandas as pd
@@ -20,13 +22,13 @@ def get_on_call_between(
     end_date: date,
     rota_id: int
 ) -> list[dict[Interval, str]]:
-    start_date = _get_first_monday_before_date(start_date)
-    end_date = _get_next_sunday_after_date(end_date)
+    start_date = get_first_monday_before_date(start_date)
+    end_date = get_next_sunday_after_date(end_date)
 
     snapshots = _get_rota_snapshots_between(rota_id, start_date, end_date)
     weekly_rota = _expand_snapshots_to_full_weeks(snapshots, start_date, end_date)
 
-    # apply_overrides()
+    # TODO: apply_overrides()
 
     return weekly_rota
 
@@ -76,35 +78,10 @@ def _expand_snapshots_to_full_weeks(
             next_snapshot = next(it_snapshots)
 
         shift = (current_date - current_snapshot['date']).days // 7
-        user = _get_at_index_with_wrap(current_snapshot['user_list'], shift)
+        user = get_at_index_with_wrap(current_snapshot['user_list'], shift)
 
-        rota.append({Interval(current_date, _add_week(current_date)): user})
+        rota.append({Interval(current_date, add_week(current_date)): user})
 
-        current_date = _add_week(current_date)       
+        current_date = add_week(current_date)       
 
     return rota
-
-def _get_next_sunday_after_date(
-    date: date
-) -> date:
-    shift = (6 - date.weekday()) % 7
-    return date + timedelta(shift)
-
-def _get_first_monday_before_date(
-    date: date
-) -> date:
-    shift = -date.weekday()
-    return date + timedelta(shift)
-
-def _add_week(
-    date: date
-) -> date:
-    return date + timedelta(7)
-
-T = TypeVar('T')
-
-def _get_at_index_with_wrap(
-    list: list[T],
-    index: int
-) -> T:
-    return list[index % len(list)]
