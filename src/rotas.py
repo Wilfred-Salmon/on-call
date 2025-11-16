@@ -6,13 +6,6 @@ from typing import TypedDict, TypeVar
 import duckdb as db
 import pandas as pd
 
-def load_db(
-    table_list: list[str], 
-    root_fp: str
-) -> None:
-    for table in table_list:
-        db.register(table, db.read_csv(f"{root_fp}/{table}.csv"))
-
 class _Snapshot(TypedDict):
     date: date
     user_list: list[str]
