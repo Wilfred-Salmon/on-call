@@ -1,9 +1,9 @@
 from datetime import date, timedelta
+from duckdb import DuckDBPyConnection
 from .interval import Interval
 from .util.date_util import add_week, get_first_monday_before_date, get_next_sunday_after_date
 from .util.list_util import get_at_index_with_wrap
 from typing import TypedDict, TypeVar
-import duckdb as db
 import pandas as pd
 
 class _Snapshot(TypedDict):
@@ -13,12 +13,13 @@ class _Snapshot(TypedDict):
 def get_rota_between(
     start_date: date,
     end_date: date,
-    rota_id: int
+    rota_id: int,
+    db: DuckDBPyConnection
 ) -> list[dict[Interval, str]]:
     start_date = get_first_monday_before_date(start_date)
     end_date = get_next_sunday_after_date(end_date)
 
-    snapshots = _get_rota_snapshots_between(rota_id, start_date, end_date)
+    snapshots = _get_rota_snapshots_between(rota_id, start_date, end_date, db)
     weekly_rota = _expand_snapshots_to_full_weeks(snapshots, start_date, end_date)
 
     # TODO: apply_overrides()
@@ -28,7 +29,8 @@ def get_rota_between(
 def _get_rota_snapshots_between(
     rota_id: int,
     start_date: date,
-    end_date: date
+    end_date: date,
+    db: DuckDBPyConnection
 ) -> list[_Snapshot]:
     snapshot_records =  db.sql(f"""
         SELECT d.date, LIST(u.name ORDER BY s.index) as user_list
