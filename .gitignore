@@ -1,4 +1,6 @@
 on-call/
 
+.vscode/
+
 **/__pycache__/
 scratchpad.py

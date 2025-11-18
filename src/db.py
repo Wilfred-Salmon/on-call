@@ -1,5 +1,7 @@
 import duckdb as db
 
+DEFAULT_TABLE_LIST = ["users", "rotas", "change_dates", "rota_snapshots", "overrides"]
+
 def build_db(
     table_list: list[str], 
     root_fp: str
