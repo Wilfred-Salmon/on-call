@@ -41,11 +41,12 @@ def _get_rota_snapshots_between(
             ON u.user_id = s.user_id
         WHERE d.rota_id = {rota_id}
             AND d.date BETWEEN
-            (
-                SELECT MAX(d.date)
+            COALESCE(
+                (SELECT MAX(d.date)
                 FROM change_dates d
                 WHERE d.date <= '{str(start_date)}'
-                    AND d.rota_id = {rota_id}
+                    AND d.rota_id = {rota_id}),
+                '{str(start_date)}'
             ) AND '{str(end_date)}'
         GROUP BY d.date
         ORDER BY d.date
