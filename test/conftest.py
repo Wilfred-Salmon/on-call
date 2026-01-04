@@ -1,6 +1,6 @@
 import pytest
 import shutil
-from src.db import build_db, DEFAULT_TABLE_LIST
+from src.db.db import build_db, DEFAULT_TABLE_LIST
 
 TEST_DB_DIRECTORY = "./test/test_db_data"
 

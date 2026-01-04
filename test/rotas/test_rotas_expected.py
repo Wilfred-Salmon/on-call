@@ -1,4 +1,4 @@
-from src.interval import Interval
+from src.rota.interval import Interval
 from datetime import date
 
 EXPECTED_NO_OVERRIDES_1 = [

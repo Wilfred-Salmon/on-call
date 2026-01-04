@@ -1,6 +1,6 @@
 import pytest
-from src.rotas import get_rota_between
-from src.interval import Interval
+from src.rota.rotas import get_rota_between
+from src.rota.interval import Interval
 from datetime import date
 from test_rotas_expected import *
 from duckdb import DuckDBPyConnection
