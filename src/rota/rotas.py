@@ -4,13 +4,14 @@ from src.rota.interval import Interval
 from src.util.date_util import add_week, get_first_monday_before_date, get_next_sunday_after_date
 from src.util.list_util import get_at_index_with_wrap
 from typing import TypedDict
+from pydantic import BaseModel
 
 # TODO: make dataclass instead of typed dict?
 class _Snapshot(TypedDict):
     date: date
     user_list: list[str]
 
-class Rota_Assignment(TypedDict):
+class Rota_Assignment(BaseModel):
     start_date: date
     end_date: date
     user: str
@@ -89,7 +90,7 @@ def _expand_snapshots_to_full_weeks(
         shift = (current_date - current_snapshot['date']).days // 7
         user = get_at_index_with_wrap(current_snapshot['user_list'], shift)
 
-        rota.append({"start_date": current_date, "end_date": add_week(current_date), "user": user})
+        rota.append(Rota_Assignment(start_date = current_date, end_date = add_week(current_date), user = user))
 
         current_date = add_week(current_date)       
 
