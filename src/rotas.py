@@ -16,6 +16,9 @@ def get_rota_between(
     rota_id: int,
     db: DuckDBPyConnection
 ) -> list[dict[Interval, str]]:
+    if end_date < start_date:
+        raise ValueError("end_date must be on or after start_date")
+    
     start_date = get_first_monday_before_date(start_date)
     end_date = get_next_sunday_after_date(end_date)
 
