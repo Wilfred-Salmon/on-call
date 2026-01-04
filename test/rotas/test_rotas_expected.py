@@ -23,3 +23,15 @@ EXPECTED_NO_OVERRIDES_1 = [
 EXPECTED_NO_OVERRIDES_2 = [
     {Interval(date(2025,2,3), date(2025,2,10)): "Harry"}
 ]
+
+EXPECTED_NO_OVERRIDES_3 = [
+    {Interval(date(2025,1,6), date(2025,1,13)): "Harry"}
+]
+
+EXPECTED_NO_OVERRIDES_4 = []
+
+EXPECTED_NO_OVERRIDES_5 = [
+    {Interval(date(2025,1,6), date(2025,1,13)): "Harry"}
+]
+
+EXPECTED_NO_OVERRIDES_6 = []
