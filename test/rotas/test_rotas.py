@@ -3,7 +3,6 @@ from src.rotas import get_rota_between
 from datetime import date
 from test_rotas_expected import *
 
-
 @pytest.mark.parametrize(
     "start_date, end_date, expected", 
     [
