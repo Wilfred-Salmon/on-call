@@ -5,6 +5,7 @@ from .util.date_util import add_week, get_first_monday_before_date, get_next_sun
 from .util.list_util import get_at_index_with_wrap
 from typing import TypedDict
 
+# TODO: make dataclass instead of typed dict?
 class _Snapshot(TypedDict):
     date: date
     user_list: list[str]
