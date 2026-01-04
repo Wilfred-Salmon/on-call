@@ -31,7 +31,6 @@ def _get_rota_snapshots_between(
     end_date: date,
     db: DuckDBPyConnection
 ) -> list[_Snapshot]:
-    # TODO: Optimise query to filter on primary key using subquery
     snapshot_records =  db.sql(f"""
         SELECT d.date, LIST(u.name ORDER BY s.index) as user_list
         FROM change_dates d
@@ -40,8 +39,13 @@ def _get_rota_snapshots_between(
         LEFT JOIN users u
             ON u.user_id = s.user_id
         WHERE d.rota_id = {rota_id}
-            AND d.date <= '{str(end_date)}'
-            AND d.date >= '{str(start_date)}'
+            AND d.date BETWEEN
+            (
+                SELECT MAX(d.date)
+                FROM change_dates d
+                WHERE d.date <= '{str(start_date)}'
+                    AND d.rota_id = {rota_id}
+            ) AND '{str(end_date)}'
         GROUP BY d.date
         ORDER BY d.date
     """).df().to_dict(orient="records")
