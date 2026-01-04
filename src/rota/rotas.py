@@ -1,6 +1,5 @@
 from datetime import date
 from duckdb import DuckDBPyConnection
-from src.rota.interval import Interval
 from src.util.date_util import add_week, get_first_monday_before_date, get_next_sunday_after_date
 from src.util.list_util import get_at_index_with_wrap
 from typing import TypedDict

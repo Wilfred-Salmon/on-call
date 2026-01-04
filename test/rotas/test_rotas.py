@@ -1,6 +1,5 @@
 import pytest
-from src.rota.rotas import get_rota_between
-from src.rota.interval import Interval
+from src.rota.rotas import get_rota_between, Rota_Assignment
 from datetime import date
 from test_rotas_expected import *
 from duckdb import DuckDBPyConnection
@@ -20,7 +19,7 @@ def test_get_rota_between_without_overrides(
     start_date: date,
     end_date: date, 
     rota_index: int, 
-    expected: list[dict[Interval, str]]
+    expected: list[Rota_Assignment]
 ):
     actual = get_rota_between(start_date, end_date, rota_index, shared_db)
 
