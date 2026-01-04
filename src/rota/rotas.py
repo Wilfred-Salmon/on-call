@@ -10,12 +10,17 @@ class _Snapshot(TypedDict):
     date: date
     user_list: list[str]
 
+class Rota_Assignment(TypedDict):
+    start_date: date
+    end_date: date
+    user: str
+
 def get_rota_between(
     start_date: date,
     end_date: date,
     rota_id: int,
     db: DuckDBPyConnection
-) -> list[dict[Interval, str]]:
+) -> list[Rota_Assignment]:
     if end_date < start_date:
         raise ValueError("end_date must be on or after start_date")
     
@@ -63,7 +68,7 @@ def _expand_snapshots_to_full_weeks(
     snapshots: list[_Snapshot], 
     start_date: date, 
     end_date: date
-) -> list[dict[Interval, str]]:
+) -> list[Rota_Assignment]:
     if len(snapshots) == 0:
         return []
     
@@ -84,7 +89,7 @@ def _expand_snapshots_to_full_weeks(
         shift = (current_date - current_snapshot['date']).days // 7
         user = get_at_index_with_wrap(current_snapshot['user_list'], shift)
 
-        rota.append({Interval(current_date, add_week(current_date)): user})
+        rota.append({"start_date": current_date, "end_date": add_week(current_date), "user": user})
 
         current_date = add_week(current_date)       
 
