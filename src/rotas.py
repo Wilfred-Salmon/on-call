@@ -1,10 +1,9 @@
-from datetime import date, timedelta
+from datetime import date
 from duckdb import DuckDBPyConnection
 from .interval import Interval
 from .util.date_util import add_week, get_first_monday_before_date, get_next_sunday_after_date
 from .util.list_util import get_at_index_with_wrap
-from typing import TypedDict, TypeVar
-import pandas as pd
+from typing import TypedDict
 
 class _Snapshot(TypedDict):
     date: date
@@ -32,6 +31,7 @@ def _get_rota_snapshots_between(
     end_date: date,
     db: DuckDBPyConnection
 ) -> list[_Snapshot]:
+    # TODO: Optimise query to filter on primary key using subquery
     snapshot_records =  db.sql(f"""
         SELECT d.date, LIST(u.name ORDER BY s.index) as user_list
         FROM change_dates d
