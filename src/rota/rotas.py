@@ -72,14 +72,13 @@ def _expand_snapshots_to_full_weeks(
     if len(snapshots) == 0:
         return []
     
-    it_snapshots = iter(snapshots)
+    rota: list[Rota_Assignment] = []
 
-    rota = []
-    
+    it_snapshots = iter(snapshots)
     current_snapshot = next(it_snapshots)
     next_snapshot = next(it_snapshots, {'date': date.max, 'user_list': []})
+    
     current_date = max(start_date, current_snapshot['date'])
-
     current_user_ordering = get_cyclical_list_iterator(current_snapshot['user_list'])
 
     while current_date < end_date:
