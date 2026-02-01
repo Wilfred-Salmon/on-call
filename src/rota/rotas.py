@@ -1,7 +1,7 @@
 from datetime import date
 from duckdb import DuckDBPyConnection
 from src.util.date_util import add_week, get_first_monday_before_date, get_next_sunday_after_date
-from src.util.list_util import get_at_index_with_wrap
+from src.util.list_util import get_cyclical_list_iterator
 from typing import TypedDict
 from pydantic import BaseModel
 
@@ -72,24 +72,27 @@ def _expand_snapshots_to_full_weeks(
     if len(snapshots) == 0:
         return []
     
-    snapshots.append({'date': date.max, 'user_list': []})
     it_snapshots = iter(snapshots)
 
     rota = []
     
     current_snapshot = next(it_snapshots)
-    next_snapshot = next(it_snapshots)
+    next_snapshot = next(it_snapshots, {'date': date.max, 'user_list': []})
     current_date = max(start_date, current_snapshot['date'])
+
+    current_user_ordering = get_cyclical_list_iterator(current_snapshot['user_list'])
 
     while current_date < end_date:
         if current_date >= next_snapshot['date']:
             current_snapshot = next_snapshot
-            next_snapshot = next(it_snapshots)
+            current_user_ordering = get_cyclical_list_iterator(current_snapshot['user_list'])
+            next_snapshot = next(it_snapshots, {'date': date.max, 'user_list': []})
 
-        shift = (current_date - current_snapshot['date']).days // 7
-        user = get_at_index_with_wrap(current_snapshot['user_list'], shift)
-
-        rota.append(Rota_Assignment(start_date = current_date, end_date = add_week(current_date), user = user))
+        rota.append(Rota_Assignment(
+            start_date = current_date, 
+            end_date = add_week(current_date), 
+            user = next(current_user_ordering)
+        ))
 
         current_date = add_week(current_date)       
 
