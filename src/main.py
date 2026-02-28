@@ -1,17 +1,15 @@
 from fastapi import FastAPI, Depends, HTTPException
 from contextlib import asynccontextmanager
 from src.rota.rotas import get_rota_between, Rota_Assignment
-from src.db.db import build_db, DEFAULT_TABLE_LIST
+from src.db.db import DB, DEFAULT_TABLE_LIST
 from datetime import date
 from duckdb import DuckDBPyConnection
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    db = build_db(DEFAULT_TABLE_LIST, "./data")
-    app.state.db = db
-    
+    db =  DB(DEFAULT_TABLE_LIST, "./data")
+    app.state.db = db.get_db()
     yield
-    
     db.close()
 
 app = FastAPI(lifespan = lifespan)
