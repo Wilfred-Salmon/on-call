@@ -1,0 +1,16 @@
+[project]
+name = "on-call"
+version = "0.1.0"
+description = "Simple on-call rota management system built with FastAPI and DuckDB."
+requires-python = ">=3.13"
+dependencies = [
+    "duckdb>=1.4.4",
+    "fastapi>=0.134.0",
+    "numpy>=2.4.2",
+    "pandas>=3.0.1",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.0.2",
+]
