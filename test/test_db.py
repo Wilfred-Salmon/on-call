@@ -1,5 +1,7 @@
 from pathlib import Path
 import pandas as pd
+import pytest
+from typing import Callable
 from src.db.db import DEFAULT_TABLE_LIST, DB
 from test.helpers import get_random_consistent_row, parse_datetime_columns
 
@@ -42,6 +44,13 @@ def test_write_tables_to_csv_all_tables(fresh_db: DB, tmp_path: Path) -> None:
             pd.read_csv(f"{tmp_path}/{table_name}.csv")
         )
         assert updated_tables[table_name].equals(written_table)
+
+
+def test_write_tables_to_csv_invalid_table_name(
+    fresh_db: DB, random_string: Callable[[int], str]
+) -> None:
+    with pytest.raises(ValueError):
+        fresh_db.write_tables_to_csv([random_string(20)])
 
 
 def _update_table_with_new_consistent_row(

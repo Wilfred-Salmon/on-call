@@ -1,5 +1,7 @@
 from pathlib import Path
-from typing import Generator
+import random
+import string
+from typing import Callable, Generator
 
 import pytest
 import shutil
@@ -25,3 +27,11 @@ def fresh_db(tmp_path: Path) -> Generator[DB]:
     yield db
 
     db.close()
+
+
+@pytest.fixture(scope="session")
+def random_string() -> Callable[[int], str]:
+    def _random_string(length: int) -> str:
+        return "".join(random.choices(string.ascii_letters, k=length))
+
+    return _random_string
