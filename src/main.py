@@ -32,3 +32,4 @@ def get_rota_between_(
         return get_rota_between(start_date, end_date, rota_id, db)
     except ValueError as e:
         raise HTTPException(status_code = 400, detail = str(e))
+
