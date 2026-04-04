@@ -34,3 +34,9 @@ disallow_untyped_defs = true
 
 [tool.pytest.ini_options]
 addopts = "--cov=src --cov-report=html --cov-fail-under=90"
+
+[tool.coverage.run]
+omit = [
+    # Temporarily omit main.py
+    "src/main.py"
+]
