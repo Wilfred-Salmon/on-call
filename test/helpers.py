@@ -1,9 +1,9 @@
 import pandas as pd
 import numpy as np
-from typing import Any
+from typing import Any, Hashable
 
-def get_random_consistent_row(df: pd.DataFrame) -> dict[str, Any]:
-    row = {}
+def get_random_consistent_row(df: pd.DataFrame) -> dict[Hashable, Any]:
+    row: dict[Hashable, Any] = {}
     for col, dtype in df.dtypes.items():
         if pd.api.types.is_integer_dtype(dtype):
             row[col] = np.random.randint(1, 100)

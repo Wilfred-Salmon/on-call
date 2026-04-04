@@ -1,3 +1,5 @@
+from collections.abc import AsyncGenerator
+
 from fastapi import FastAPI, Depends, HTTPException
 from contextlib import asynccontextmanager
 from src.rota.rotas import get_rota_between, Rota_Assignment
@@ -6,7 +8,7 @@ from datetime import date
 from duckdb import DuckDBPyConnection
 
 @asynccontextmanager
-async def lifespan(app: FastAPI):
+async def lifespan(app: FastAPI) -> AsyncGenerator[None]:
     db =  DB(DEFAULT_TABLE_LIST, "./data")
     app.state.db = db.get_db()
     yield
@@ -14,7 +16,7 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(lifespan = lifespan)
 
-def get_db():
+def get_db() -> DuckDBPyConnection:
     return app.state.db
 
 @app.get("/")

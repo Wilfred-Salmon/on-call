@@ -1,3 +1,4 @@
+from pathlib import Path
 from typing import Generator
 
 import pytest
@@ -15,9 +16,9 @@ def shared_db() -> Generator[DB]:
     db.close()
 
 @pytest.fixture()
-def fresh_db(tmp_path) -> Generator[DB]:
+def fresh_db(tmp_path: Path) -> Generator[DB]:
     shutil.copytree(TEST_DB_DIRECTORY, tmp_path, dirs_exist_ok = True)
-    db = DB(DEFAULT_TABLE_LIST, tmp_path)
+    db = DB(DEFAULT_TABLE_LIST, str(tmp_path))
 
     yield db
 

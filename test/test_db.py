@@ -1,19 +1,20 @@
 import duckdb as db
+from pathlib import Path
 import pandas as pd
 from src.db.db import DEFAULT_TABLE_LIST, DB
 from test.helpers import get_random_consistent_row, parse_datetime_columns
 
-def test_build_db(shared_db: DB):
+def test_build_db(shared_db: DB) -> None:
     tables = {item[0] for item in shared_db.get_db().sql("SHOW TABLES").fetchall()}
 
     assert tables == set(DEFAULT_TABLE_LIST)
 
-def test_fresh_db(fresh_db: DB):
+def test_fresh_db(fresh_db: DB) -> None:
     tables = {item[0] for item in fresh_db.get_db().sql("SHOW TABLES").fetchall()}
 
     assert tables == set(DEFAULT_TABLE_LIST)
 
-def test_write_tables_to_csv_single_table(fresh_db: DB, tmp_path):
+def test_write_tables_to_csv_single_table(fresh_db: DB, tmp_path: Path) -> None:
     updated_table = _update_table_with_new_consistent_row(fresh_db, DEFAULT_TABLE_LIST[0])
 
     fresh_db.write_tables_to_csv(DEFAULT_TABLE_LIST[0:1])
@@ -21,7 +22,7 @@ def test_write_tables_to_csv_single_table(fresh_db: DB, tmp_path):
 
     assert updated_table.equals(written_table)
 
-def test_write_tables_to_csv_all_tables(fresh_db: DB, tmp_path):
+def test_write_tables_to_csv_all_tables(fresh_db: DB, tmp_path: Path) -> None:
     updated_tables: dict[str, pd.DataFrame] = {}
     for table_name in DEFAULT_TABLE_LIST:
         updated_tables[table_name] = _update_table_with_new_consistent_row(fresh_db, table_name)

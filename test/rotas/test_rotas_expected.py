@@ -28,4 +28,4 @@ EXPECTED_NO_OVERRIDES_3 = [
     Rota_Assignment(start_date = date(2025,1,6), end_date = date(2025,1,13), user = "Harry")
 ]
 
-EXPECTED_NO_OVERRIDES_4 = []
+EXPECTED_NO_OVERRIDES_4: list[Rota_Assignment] = []

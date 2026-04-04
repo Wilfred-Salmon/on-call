@@ -1,3 +1,5 @@
+from types import TracebackType
+
 import duckdb as db
 from contextlib import AbstractContextManager
 
@@ -44,5 +46,5 @@ class DB(AbstractContextManager[db.DuckDBPyConnection]):
     def __enter__(self) -> db.DuckDBPyConnection:
         return self._db
     
-    def __exit__(self, exc_type, exc_value, traceback) -> None:
+    def __exit__(self, exc_type: type[BaseException] | None, exc_value: BaseException | None, traceback: TracebackType | None) -> None:
         self._db.close()

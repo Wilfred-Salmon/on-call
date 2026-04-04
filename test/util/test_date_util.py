@@ -4,7 +4,7 @@ from types import SimpleNamespace
 from datetime import date
 
 @pytest.fixture(scope="module")
-def simple_dates():
+def simple_dates() -> SimpleNamespace:
     return SimpleNamespace(
         MONDAY = date(2025, 11, 17),
         WEDNESDAY = date(2025, 11, 19),
@@ -12,17 +12,17 @@ def simple_dates():
         FOLLOWING_MONDAY = date(2025, 11, 24)
     )
 
-def test_get_next_sunday_after_date_on_midweek(simple_dates):
+def test_get_next_sunday_after_date_on_midweek(simple_dates: SimpleNamespace) -> None:
     assert get_next_sunday_after_date(simple_dates.WEDNESDAY) == simple_dates.SUNDAY
 
-def test_get_next_sunday_after_date_on_sunday(simple_dates):
+def test_get_next_sunday_after_date_on_sunday(simple_dates: SimpleNamespace) -> None:
     assert get_next_sunday_after_date(simple_dates.SUNDAY) == simple_dates.SUNDAY
 
-def test_get_first_monday_before_date_on_monday(simple_dates):
+def test_get_first_monday_before_date_on_monday(simple_dates: SimpleNamespace) -> None:
     assert get_first_monday_before_date(simple_dates.MONDAY) == simple_dates.MONDAY
 
-def test_get_first_monday_before_date_on_midweek(simple_dates):
+def test_get_first_monday_before_date_on_midweek(simple_dates: SimpleNamespace) -> None:
     assert get_first_monday_before_date(simple_dates.WEDNESDAY) == simple_dates.MONDAY
 
-def test_add_week(simple_dates):
+def test_add_week(simple_dates: SimpleNamespace) -> None:
     assert add_week(simple_dates.MONDAY) == simple_dates.FOLLOWING_MONDAY

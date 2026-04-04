@@ -76,7 +76,8 @@ def _expand_snapshots_to_full_weeks(
 
     it_snapshots = iter(snapshots)
     current_snapshot = next(it_snapshots)
-    next_snapshot = next(it_snapshots, {'date': date.max, 'user_list': []})
+    _DUMMY_SNAPSHOT = _Snapshot({'date': date.max, 'user_list': []})
+    next_snapshot = next(it_snapshots, _DUMMY_SNAPSHOT)
     
     current_date = max(start_date, current_snapshot['date'])
     current_user_ordering = get_cyclical_list_iterator(current_snapshot['user_list'])
@@ -85,11 +86,11 @@ def _expand_snapshots_to_full_weeks(
         if current_date >= next_snapshot['date']:
             current_snapshot = next_snapshot
             current_user_ordering = get_cyclical_list_iterator(current_snapshot['user_list'])
-            next_snapshot = next(it_snapshots, {'date': date.max, 'user_list': []})
+            next_snapshot = next(it_snapshots, _DUMMY_SNAPSHOT)
 
         rota.append(Rota_Assignment(
             start_date = current_date, 
-            end_date = add_week(current_date), 
+            end_date = add_week(current_date),
             user = next(current_user_ordering)
         ))
 

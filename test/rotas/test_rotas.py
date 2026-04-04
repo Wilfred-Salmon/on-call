@@ -1,7 +1,7 @@
 import pytest
 from src.rota.rotas import get_rota_between, Rota_Assignment
 from datetime import date
-from test_rotas_expected import *
+from test.rotas.test_rotas_expected import *
 from src.db.db import DB
 
 @pytest.mark.parametrize(
@@ -20,7 +20,7 @@ def test_get_rota_between_without_overrides(
     end_date: date, 
     rota_index: int, 
     expected: list[Rota_Assignment]
-):
+)-> None:
     actual = get_rota_between(start_date, end_date, rota_index, shared_db.get_db())
 
     assert actual == expected
@@ -38,13 +38,13 @@ def test_get_rota_between_invalid_dates(
     start_date: date, 
     end_date: date, 
     rota_index: int
-):
+)-> None:
     with pytest.raises(ValueError):
         get_rota_between(start_date, end_date, rota_index, shared_db.get_db())
 
 def test_get_rota_between_invalid_rota_id(
     shared_db: DB, 
-    invalid_rota_id = 1000
-):
+    invalid_rota_id: int = 1000
+)-> None:
     actual = get_rota_between(date(2025,1,1), date(2025,1,1), invalid_rota_id, shared_db.get_db())
     assert actual == []
