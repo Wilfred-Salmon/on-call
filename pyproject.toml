@@ -5,12 +5,38 @@ description = "Simple on-call rota management system built with FastAPI and Duck
 requires-python = ">=3.13"
 dependencies = [
     "duckdb>=1.4.4",
-    "fastapi>=0.134.0",
+    "fastapi[standard]>=0.134.0",
     "numpy>=2.4.2",
     "pandas>=3.0.1",
 ]
 
 [dependency-groups]
 dev = [
+    "mypy>=1.20.0",
+    "pip>=26.0.1",
+    "pre-commit>=4.5.1",
     "pytest>=9.0.2",
+    "pytest-cov>=7.1.0",
+    "ruff>=0.15.9",
+]
+
+[tool.fastapi]
+entrypoint = "src.main:app"
+
+[tool.mypy]
+disallow_untyped_defs = true
+
+[tool.ruff.lint.per-file-ignores]
+"test/*" = [
+    "F405", # 'from module import *' used; unable to detect undefined names
+    "F403", # 'from module import *' used; unable to detect undefined names
+]
+
+[tool.pytest.ini_options]
+addopts = "--cov=src --cov-report=html --cov-fail-under=90"
+
+[tool.coverage.run]
+omit = [
+    # Temporarily omit main.py
+    "src/main.py"
 ]

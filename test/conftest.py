@@ -1,22 +1,37 @@
+from pathlib import Path
+import random
+import string
+from typing import Callable, Generator
+
 import pytest
 import shutil
-from src.db.db import build_db, DEFAULT_TABLE_LIST
+from src.db.db import DB, DEFAULT_TABLE_LIST
 
 TEST_DB_DIRECTORY = "./test/test_db_data"
 
+
 @pytest.fixture(scope="session")
-def shared_db():
-    db = build_db(DEFAULT_TABLE_LIST, TEST_DB_DIRECTORY)
+def shared_db() -> Generator[DB]:
+    db = DB(DEFAULT_TABLE_LIST, TEST_DB_DIRECTORY)
 
     yield db
 
     db.close()
+
 
 @pytest.fixture()
-def fresh_db(tmp_path):
-    shutil.copytree(TEST_DB_DIRECTORY, tmp_path, dirs_exist_ok = True)
-    db = build_db(DEFAULT_TABLE_LIST, tmp_path)
+def fresh_db(tmp_path: Path) -> Generator[DB]:
+    shutil.copytree(TEST_DB_DIRECTORY, tmp_path, dirs_exist_ok=True)
+    db = DB(DEFAULT_TABLE_LIST, str(tmp_path))
 
     yield db
 
     db.close()
+
+
+@pytest.fixture(scope="session")
+def random_string() -> Callable[[int], str]:
+    def _random_string(length: int) -> str:
+        return "".join(random.choices(string.ascii_letters, k=length))
+
+    return _random_string

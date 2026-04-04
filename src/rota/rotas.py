@@ -1,29 +1,33 @@
 from datetime import date
 from duckdb import DuckDBPyConnection
-from src.util.date_util import add_week, get_first_monday_before_date, get_next_sunday_after_date
+from src.util.date_util import (
+    add_week,
+    get_first_monday_before_date,
+    get_next_sunday_after_date,
+)
 from src.util.list_util import get_cyclical_list_iterator
 from typing import TypedDict
 from pydantic import BaseModel
+
 
 # TODO: make dataclass instead of typed dict?
 class _Snapshot(TypedDict):
     date: date
     user_list: list[str]
 
+
 class Rota_Assignment(BaseModel):
     start_date: date
     end_date: date
     user: str
 
+
 def get_rota_between(
-    start_date: date,
-    end_date: date,
-    rota_id: int,
-    db: DuckDBPyConnection
+    start_date: date, end_date: date, rota_id: int, db: DuckDBPyConnection
 ) -> list[Rota_Assignment]:
     if end_date < start_date:
         raise ValueError("end_date must be on or after start_date")
-    
+
     start_date = get_first_monday_before_date(start_date)
     end_date = get_next_sunday_after_date(end_date)
 
@@ -34,13 +38,12 @@ def get_rota_between(
 
     return weekly_rota
 
+
 def _get_rota_snapshots_between(
-    rota_id: int,
-    start_date: date,
-    end_date: date,
-    db: DuckDBPyConnection
+    rota_id: int, start_date: date, end_date: date, db: DuckDBPyConnection
 ) -> list[_Snapshot]:
-    snapshot_records =  db.sql(f"""
+    snapshot_records = (
+        db.sql(f"""
         SELECT d.date, LIST(u.name ORDER BY s.index) as user_list
         FROM change_dates d
         LEFT JOIN rota_snapshots s
@@ -58,41 +61,51 @@ def _get_rota_snapshots_between(
             ) AND '{str(end_date)}'
         GROUP BY d.date
         ORDER BY d.date
-    """).df().to_dict(orient="records")
+    """)
+        .df()
+        .to_dict(orient="records")
+    )
 
-    snapshots: list[_Snapshot] = [{"date": r["date"].date(), "user_list": r["user_list"]} for r in snapshot_records]
+    snapshots: list[_Snapshot] = [
+        {"date": r["date"].date(), "user_list": r["user_list"]}
+        for r in snapshot_records
+    ]
 
     return snapshots
 
+
 def _expand_snapshots_to_full_weeks(
-    snapshots: list[_Snapshot], 
-    start_date: date, 
-    end_date: date
+    snapshots: list[_Snapshot], start_date: date, end_date: date
 ) -> list[Rota_Assignment]:
     if len(snapshots) == 0:
         return []
-    
+
     rota: list[Rota_Assignment] = []
 
     it_snapshots = iter(snapshots)
     current_snapshot = next(it_snapshots)
-    next_snapshot = next(it_snapshots, {'date': date.max, 'user_list': []})
-    
-    current_date = max(start_date, current_snapshot['date'])
-    current_user_ordering = get_cyclical_list_iterator(current_snapshot['user_list'])
+    _DUMMY_SNAPSHOT = _Snapshot({"date": date.max, "user_list": []})
+    next_snapshot = next(it_snapshots, _DUMMY_SNAPSHOT)
+
+    current_date = max(start_date, current_snapshot["date"])
+    current_user_ordering = get_cyclical_list_iterator(current_snapshot["user_list"])
 
     while current_date < end_date:
-        if current_date >= next_snapshot['date']:
+        if current_date >= next_snapshot["date"]:
             current_snapshot = next_snapshot
-            current_user_ordering = get_cyclical_list_iterator(current_snapshot['user_list'])
-            next_snapshot = next(it_snapshots, {'date': date.max, 'user_list': []})
+            current_user_ordering = get_cyclical_list_iterator(
+                current_snapshot["user_list"]
+            )
+            next_snapshot = next(it_snapshots, _DUMMY_SNAPSHOT)
 
-        rota.append(Rota_Assignment(
-            start_date = current_date, 
-            end_date = add_week(current_date), 
-            user = next(current_user_ordering)
-        ))
+        rota.append(
+            Rota_Assignment(
+                start_date=current_date,
+                end_date=add_week(current_date),
+                user=next(current_user_ordering),
+            )
+        )
 
-        current_date = add_week(current_date)       
+        current_date = add_week(current_date)
 
     return rota
