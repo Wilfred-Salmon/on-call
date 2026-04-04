@@ -14,6 +14,7 @@ dependencies = [
 dev = [
     "mypy>=1.20.0",
     "pip>=26.0.1",
+    "pre-commit>=4.5.1",
     "pytest>=9.0.2",
     "pytest-cov>=7.1.0",
     "ruff>=0.15.9",
@@ -33,3 +34,13 @@ disallow_untyped_defs = true
 
 [tool.pytest.ini_options]
 addopts = "--cov=src --cov-report=html --cov-fail-under=90"
+
+[tool.pre-commit]
+repos = [
+    { repo = "local", hooks = [
+        { id = "mypy-src", name = "mypy src", entry = "mypy src/", language = "system", always_run = true },
+        { id = "mypy-test", name = "mypy test", entry = "mypy test/", language = "system", always_run = true },
+        { id = "ruff-format", name = "ruff format", entry = "ruff format .", language = "system", always_run = true },
+        { id = "ruff-check", name = "ruff check", entry = "ruff check .", language = "system", always_run = true }
+    ] }
+]
