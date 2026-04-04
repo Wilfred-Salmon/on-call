@@ -23,3 +23,9 @@ entrypoint = "src.main:app"
 
 [tool.mypy]
 disallow_untyped_defs = true
+
+[tool.ruff.lint.per-file-ignores]
+"test/*" = [
+    "F405", # 'from module import *' used; unable to detect undefined names
+    "F403", # 'from module import *' used; unable to detect undefined names
+]
