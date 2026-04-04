@@ -35,11 +35,13 @@ def _update_table_with_new_consistent_row(fresh_db: DB, table_name: str) -> pd.D
     current_table = fresh_db.get_db().sql(f"SELECT * FROM {table_name}").df()
     if current_table.empty:
         _cast_all_columns_to_strings(current_table)
+    
     new_row = get_random_consistent_row(current_table)
     fresh_db.get_db().sql(f"""
         INSERT INTO {table_name}
         VALUES ({', '.join([f"'{str(new_row[v])}'" for v in current_table.columns])})
     """)
+    
     updated_table = pd.concat([current_table, pd.DataFrame([new_row])], ignore_index=True)
     return updated_table
 
