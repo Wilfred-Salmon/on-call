@@ -15,6 +15,7 @@ dev = [
     "mypy>=1.20.0",
     "pip>=26.0.1",
     "pytest>=9.0.2",
+    "pytest-cov>=7.1.0",
     "ruff>=0.15.9",
 ]
 
@@ -29,3 +30,6 @@ disallow_untyped_defs = true
     "F405", # 'from module import *' used; unable to detect undefined names
     "F403", # 'from module import *' used; unable to detect undefined names
 ]
+
+[tool.pytest.ini_options]
+addopts = "--cov=src --cov-report=html --cov-fail-under=90"
