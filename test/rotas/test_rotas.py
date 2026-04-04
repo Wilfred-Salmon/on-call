@@ -2,7 +2,7 @@ import pytest
 from src.rota.rotas import get_rota_between, Rota_Assignment
 from datetime import date
 from test_rotas_expected import *
-from duckdb import DuckDBPyConnection
+from src.db.db import DB
 
 @pytest.mark.parametrize(
     "start_date, end_date, rota_index, expected", 
@@ -15,13 +15,13 @@ from duckdb import DuckDBPyConnection
     ids = ["Long Query", "No expansion", "before rota start to within rota", "fully before rota start"]
 )
 def test_get_rota_between_without_overrides(
-    shared_db: DuckDBPyConnection, 
+    shared_db: DB, 
     start_date: date,
     end_date: date, 
     rota_index: int, 
     expected: list[Rota_Assignment]
 ):
-    actual = get_rota_between(start_date, end_date, rota_index, shared_db)
+    actual = get_rota_between(start_date, end_date, rota_index, shared_db.get_db())
 
     assert actual == expected
 
@@ -34,17 +34,17 @@ def test_get_rota_between_without_overrides(
     ids = ["end date before start date, fixed by expansion", "end date before start date, not fixed by expansion"]
 )
 def test_get_rota_between_invalid_dates(
-    shared_db: DuckDBPyConnection,
+    shared_db: DB,
     start_date: date, 
     end_date: date, 
     rota_index: int
 ):
     with pytest.raises(ValueError):
-        get_rota_between(start_date, end_date, rota_index, shared_db)
+        get_rota_between(start_date, end_date, rota_index, shared_db.get_db())
 
 def test_get_rota_between_invalid_rota_id(
-    shared_db: DuckDBPyConnection, 
+    shared_db: DB, 
     invalid_rota_id = 1000
 ):
-    actual = get_rota_between(date(2025,1,1), date(2025,1,1), invalid_rota_id, shared_db)
+    actual = get_rota_between(date(2025,1,1), date(2025,1,1), invalid_rota_id, shared_db.get_db())
     assert actual == []
