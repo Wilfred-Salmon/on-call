@@ -1,7 +1,7 @@
 import pytest
 from src.rota.rotas import get_rota_between, Rota_Assignment
 from datetime import date
-from test.rotas.test_rotas_expected import *
+from test.rotas.expected.get_rota_between import *
 from src.db.db import DB
 
 
