@@ -42,8 +42,8 @@ def test_add_user_to_rota_on_date_fails_with_future_snapshots(
 )
 @pytest.mark.parametrize(
     "initial_user_list",
-    [(["user_1"]), (["user_1", "user_2"])],
-    ids=["one_user", "two_users"],
+    [([]), (["user_1"]), (["user_1", "user_2"])],
+    ids=["no_users", "one_user", "two_users"],
 )
 def test_add_user_to_rota_on_date(
     offset: int, expected_cycle: int, initial_user_list: list[str], custom_db: DBFactory
@@ -84,5 +84,5 @@ def test_add_user_to_rota_on_date(
                 rota_table={INITIAL_ROTA_NAME: 0},
             )
         )
-        assert expected_snapshot_table == snapshot_table
         assert expected_change_date_table == change_date_table
+        assert expected_snapshot_table == snapshot_table

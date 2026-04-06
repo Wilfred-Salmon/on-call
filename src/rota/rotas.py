@@ -83,9 +83,10 @@ def _get_rota_snapshots_between(
 def _get_last_rota_snapshot_before_date(
     rota_id: int, date: date, db: DuckDBPyConnection
 ) -> _Snapshot_with_user_ids | None:
+    # TODO: think of a better way to do this, without the COALESCE FILTER thing. Wrap all SQL queries like this?
     snapshot_records = (
         db.sql(f"""
-        SELECT d.date, LIST(s.user_id ORDER BY s.index) as user_list
+        SELECT d.date, COALESCE(LIST(s.user_id ORDER BY s.index) FILTER (WHERE s.user_id IS NOT NULL), []) as user_list
         FROM change_dates d
         LEFT JOIN rota_snapshots s
             ON s.snapshot_id = d.snapshot_id
@@ -176,7 +177,7 @@ def add_user_to_rota_on_date(user_id: int, rota_id: int, date: date, db: DB) -> 
 def _get_new_user_list(
     user_id: int, date: date, latest_snapshot: _Snapshot_with_user_ids | None
 ) -> list[int]:
-    if latest_snapshot is None:
+    if latest_snapshot is None or len(latest_snapshot["user_list"]) == 0:
         new_user_list = [user_id]
     else:
         latest_snaphost_valid_on = latest_snapshot["date"]

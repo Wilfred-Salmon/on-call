@@ -8,7 +8,7 @@ from datetime import date
 import pytest
 import shutil
 import pandas as pd
-from src.db.db import DB, DEFAULT_TABLE_LIST
+from src.db.db import DB, DEFAULT_TABLE_SCHEMA
 from test.helpers import (
     DBFactory,
     DBSpecification,
@@ -56,7 +56,7 @@ def fresh_db_with_rotas(
 
     _write_db_tables(path, user_table, rota_table, change_dates, rota_snapshots)
 
-    db = DB(DEFAULT_TABLE_LIST, str(path))
+    db = DB(DEFAULT_TABLE_SCHEMA, str(path))
     yield db
     db.close()
 
@@ -72,8 +72,12 @@ def _write_db_tables(
     change_dates: list[RawChangeDate],
     rota_snapshots: list[RawSnapshot],
 ) -> None:
-    pd.DataFrame(change_dates).to_csv(path / "change_dates.csv", index=False)
-    pd.DataFrame(rota_snapshots).to_csv(path / "rota_snapshots.csv", index=False)
+    pd.DataFrame(change_dates, columns=["rota_id", "date", "snapshot_id"]).to_csv(
+        path / "change_dates.csv", index=False
+    )
+    pd.DataFrame(rota_snapshots, columns=["snapshot_id", "user_id", "index"]).to_csv(
+        path / "rota_snapshots.csv", index=False
+    )
     pd.DataFrame(list(user_table.items()), columns=["name", "user_id"]).to_csv(
         path / "users.csv", index=False
     )
