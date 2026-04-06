@@ -58,6 +58,10 @@ def parse_datetime_columns(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
+def construct_default_user_table(user_names_list: list[str]) -> dict[str, int]:
+    return {user_name: i for i, user_name in enumerate(set(user_names_list))}
+
+
 def snapshot_tables_from_specification(
     db_specification: DBSpecification,
     user_id_dict: dict[str, int],
