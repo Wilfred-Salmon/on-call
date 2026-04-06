@@ -105,7 +105,7 @@ def _get_last_rota_snapshot_before_date(
     return {"date": snapshot["date"], "user_list": snapshot["user_list"]}
 
 
-def _snapshots_exist_after_date(
+def _snapshots_exist_on_or_after_date(
     rota_id: int, date: date, db: DuckDBPyConnection
 ) -> bool:
     snapshot_records = (
@@ -113,7 +113,7 @@ def _snapshots_exist_after_date(
         SELECT 1
         FROM change_dates d
         WHERE d.rota_id = {rota_id}
-            AND d.date > '{str(date)}'
+            AND d.date >= '{str(date)}'
         LIMIT 1
     """)
         .df()
@@ -161,7 +161,7 @@ def _expand_snapshots_to_full_weeks(
 
 def add_user_to_rota_on_date(user_id: int, rota_id: int, date: date, db: DB) -> None:
     date = get_first_monday_before_date(date)
-    if _snapshots_exist_after_date(rota_id, date, db.get_db()):
+    if _snapshots_exist_on_or_after_date(rota_id, date, db.get_db()):
         raise ValueError(
             f"Cannot add user on {date} to rota {rota_id}, as there are changes after that date"
         )

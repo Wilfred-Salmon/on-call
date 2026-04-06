@@ -2,6 +2,10 @@ import pandas as pd
 import numpy as np
 from typing import Any, Hashable
 
+from src.rota.rotas import Snapshot_with_usernames
+
+type DBSpecification = dict[str, list[Snapshot_with_usernames]]
+
 
 def get_random_consistent_row(df: pd.DataFrame) -> dict[Hashable, Any]:
     row: dict[Hashable, Any] = {}

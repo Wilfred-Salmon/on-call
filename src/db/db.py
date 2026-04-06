@@ -1,7 +1,4 @@
-from types import TracebackType
-
 import duckdb as db
-from contextlib import AbstractContextManager
 
 DEFAULT_TABLE_LIST = [
     "users",
@@ -12,7 +9,7 @@ DEFAULT_TABLE_LIST = [
 ]
 
 
-class DB(AbstractContextManager[db.DuckDBPyConnection]):
+class DB:
     _table_list: list[str]
     _root_fp: str
     _db: db.DuckDBPyConnection
@@ -50,15 +47,4 @@ class DB(AbstractContextManager[db.DuckDBPyConnection]):
         self._db.sql(f"COPY {table_name} TO '{file_path}' (FORMAT CSV, HEADER)")
 
     def close(self) -> None:
-        self._db.close()
-
-    def __enter__(self) -> db.DuckDBPyConnection:
-        return self._db
-
-    def __exit__(
-        self,
-        exc_type: type[BaseException] | None,
-        exc_value: BaseException | None,
-        traceback: TracebackType | None,
-    ) -> None:
         self._db.close()

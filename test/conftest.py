@@ -1,17 +1,18 @@
+from contextlib import AbstractContextManager, contextmanager
 from pathlib import Path
 import random
 import string
 from typing import Callable, Generator
-from src.rota.rotas import Snapshot_with_usernames
 from datetime import date
 
 import pytest
 import shutil
 import pandas as pd
 from src.db.db import DB, DEFAULT_TABLE_LIST
+from test.helpers import DBSpecification
 
 SHARED_DB_PATH = Path("./test/test_db_data")
-DEFAULT_DB_SPECIFICATION: dict[str, list[Snapshot_with_usernames]] = {
+DEFAULT_DB_SPECIFICATION: DBSpecification = {
     "potion_brewing": [
         {"date": date(2025, 1, 6), "user_list": ["Harry"]},
         {"date": date(2025, 3, 3), "user_list": ["Ron", "Harry"]},
@@ -29,9 +30,7 @@ def random_string() -> Callable[[int], str]:
     return _random_string
 
 
-def fresh_db_with_rotas(
-    path: Path, db_specification: dict[str, list[Snapshot_with_usernames]]
-) -> Generator[DB]:
+def fresh_db_with_rotas(path: Path, db_specification: DBSpecification) -> Generator[DB]:
     user_names_list = [
         user_name
         for user_list in [
@@ -93,3 +92,14 @@ def shared_db() -> Generator[DB]:
 @pytest.fixture()
 def fresh_db(tmp_path: Path) -> Generator[DB]:
     yield from fresh_db_with_rotas(tmp_path, DEFAULT_DB_SPECIFICATION)
+
+
+@pytest.fixture()
+def custom_db(
+    tmp_path: Path,
+) -> Callable[[DBSpecification], AbstractContextManager[DB]]:
+    @contextmanager
+    def _custom_db(db_specification: DBSpecification) -> Generator[DB]:
+        yield from fresh_db_with_rotas(tmp_path, db_specification)
+
+    return _custom_db
