@@ -7,7 +7,7 @@ from src.util.date_util import get_first_monday_before_date
 from test.helpers import (
     DBFactory,
     DBSpecification,
-    change_timestamps_to_dates,
+    get_full_table,
     snapshot_tables_from_specification,
     construct_default_user_table,
 )
@@ -63,19 +63,8 @@ def test_add_user_to_rota_on_date(
             db=db,
         )
 
-        snapshot_table = (
-            db.get_db()
-            .sql("SELECT * FROM rota_snapshots")
-            .fetchdf()
-            .to_dict(orient="records")
-        )
-        change_date_table = (
-            db.get_db()
-            .sql("SELECT * FROM change_dates")
-            .fetchdf()
-            .to_dict(orient="records")
-        )
-        change_timestamps_to_dates(change_date_table)
+        snapshot_table = get_full_table(db, "rota_snapshots")
+        change_date_table = get_full_table(db, "change_dates")
 
         custom_db_specification["rota_1"].append(
             {

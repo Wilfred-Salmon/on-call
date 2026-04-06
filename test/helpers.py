@@ -95,7 +95,21 @@ def snapshot_tables_from_specification(
     return change_dates, rota_snapshots
 
 
-def change_timestamps_to_dates(records: list[dict[Hashable, Any]]) -> None:
+def get_full_table(
+    db: DB, table_name: str, make_timestamps_dates: bool = True
+) -> list[dict[Hashable, Any]]:
+    raw_records = (
+        db.get_db()
+        .sql(f"SELECT * FROM {table_name}")
+        .fetchdf()
+        .to_dict(orient="records")
+    )
+    if make_timestamps_dates:
+        _change_timestamps_to_dates(raw_records)
+    return raw_records
+
+
+def _change_timestamps_to_dates(records: list[dict[Hashable, Any]]) -> None:
     for record in records:
         for key, value in record.items():
             if isinstance(value, pd.Timestamp):
