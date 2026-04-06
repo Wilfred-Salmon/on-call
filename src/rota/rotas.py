@@ -12,7 +12,7 @@ from pydantic import BaseModel
 
 
 # TODO: make dataclass instead of typed dict?
-class _Snapshot_with_usernames(TypedDict):
+class Snapshot_with_usernames(TypedDict):
     date: date
     user_list: list[str]
 
@@ -47,7 +47,7 @@ def get_rota_between(
 
 def _get_rota_snapshots_between(
     rota_id: int, start_date: date, end_date: date, db: DuckDBPyConnection
-) -> list[_Snapshot_with_usernames]:
+) -> list[Snapshot_with_usernames]:
     snapshot_records = (
         db.sql(f"""
         SELECT d.date, LIST(u.name ORDER BY s.index) as user_list
@@ -72,7 +72,7 @@ def _get_rota_snapshots_between(
         .to_dict(orient="records")
     )
 
-    snapshots: list[_Snapshot_with_usernames] = [
+    snapshots: list[Snapshot_with_usernames] = [
         {"date": r["date"].date(), "user_list": r["user_list"]}
         for r in snapshot_records
     ]
@@ -123,7 +123,7 @@ def _snapshots_exist_after_date(
 
 
 def _expand_snapshots_to_full_weeks(
-    snapshots: list[_Snapshot_with_usernames], start_date: date, end_date: date
+    snapshots: list[Snapshot_with_usernames], start_date: date, end_date: date
 ) -> list[Rota_Assignment]:
     if len(snapshots) == 0:
         return []
@@ -132,7 +132,7 @@ def _expand_snapshots_to_full_weeks(
 
     it_snapshots = iter(snapshots)
     current_snapshot = next(it_snapshots)
-    _DUMMY_SNAPSHOT = _Snapshot_with_usernames({"date": date.max, "user_list": []})
+    _DUMMY_SNAPSHOT = Snapshot_with_usernames({"date": date.max, "user_list": []})
     next_snapshot = next(it_snapshots, _DUMMY_SNAPSHOT)
 
     current_date = max(start_date, current_snapshot["date"])
