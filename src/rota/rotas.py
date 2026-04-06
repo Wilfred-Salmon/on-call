@@ -102,7 +102,7 @@ def _get_last_rota_snapshot_before_date(
         return None
 
     snapshot = snapshot_records[0]
-    return {"date": snapshot["date"], "user_list": snapshot["user_list"]}
+    return {"date": snapshot["date"].date(), "user_list": snapshot["user_list"]}
 
 
 def _snapshots_exist_on_or_after_date(
