@@ -79,9 +79,9 @@ def test_add_user_to_rota_on_date(
         expected_change_date_table, expected_snapshot_table = (
             snapshot_tables_from_specification(
                 custom_db_specification,
-                user_id_dict=construct_default_user_table(initial_user_list)
+                user_table=construct_default_user_table(initial_user_list)
                 | {NEW_USER_NAME: len(initial_user_list)},
-                rota_id_dict={INITIAL_ROTA_NAME: 0},
+                rota_table={INITIAL_ROTA_NAME: 0},
             )
         )
         assert expected_snapshot_table == snapshot_table

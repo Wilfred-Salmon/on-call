@@ -64,8 +64,8 @@ def construct_default_user_table(user_names_list: list[str]) -> dict[str, int]:
 
 def snapshot_tables_from_specification(
     db_specification: DBSpecification,
-    user_id_dict: dict[str, int],
-    rota_id_dict: dict[str, int],
+    user_table: dict[str, int],
+    rota_table: dict[str, int],
 ) -> tuple[list[RawChangeDate], list[RawSnapshot]]:
     snapshot_id = 0
     change_dates = []
@@ -75,7 +75,7 @@ def snapshot_tables_from_specification(
             change_dates.append(
                 RawChangeDate(
                     {
-                        "rota_id": rota_id_dict[rota],
+                        "rota_id": rota_table[rota],
                         "date": snapshot["date"],
                         "snapshot_id": snapshot_id,
                     }
@@ -86,7 +86,7 @@ def snapshot_tables_from_specification(
                     RawSnapshot(
                         {
                             "snapshot_id": snapshot_id,
-                            "user_id": user_id_dict[user_name],
+                            "user_id": user_table[user_name],
                             "index": index,
                         }
                     )
