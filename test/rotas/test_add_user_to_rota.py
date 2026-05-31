@@ -35,6 +35,11 @@ def test_add_user_to_rota_on_date_fails_with_future_snapshots(
             add_user_to_rota_on_date(user_id=0, rota_id=0, date=new_date, db=db)
 
 
+# TODO: Firstly, there are some magic constants to remove here.
+# Secondly, I don't like how this and the remove user test rely on the internal database structure
+# Instead, these should probably be tested using get_rota_between. I think making rota a class
+# with a get_rota_between method would probably make this nicer. We should add a test for an invalid rota id
+# (and likewise for removing a user)
 @pytest.mark.parametrize(
     "offset,expected_cycle",
     [(7, 1), (8, 1), (14, 2), (15, 2)],

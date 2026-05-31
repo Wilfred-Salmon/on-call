@@ -47,6 +47,7 @@ def test_get_rota_between_invalid_dates(
         get_rota_between(start_date, end_date, rota_index, shared_db.get_db())
 
 
+# TODO: this should probably instead throw an exception saying this isn't a valid rota id
 def test_get_rota_between_invalid_rota_id(
     shared_db: DB, invalid_rota_id: int = 1000
 ) -> None:
