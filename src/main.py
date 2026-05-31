@@ -4,7 +4,7 @@ from fastapi import FastAPI, Depends, HTTPException
 from contextlib import asynccontextmanager
 from src.rota.rotas import add_user_to_rota_on_date, get_rota_between, Rota_Assignment
 from src.db.db import DB, DEFAULT_TABLE_SCHEMA
-from datetime import date, datetime
+from datetime import date
 
 
 @asynccontextmanager
@@ -44,7 +44,7 @@ def get_rota_between_(
 def add_user_to_rota_(
     user_id: int,
     rota_id: int,
-    date: datetime,
+    date: date,
     db: DB = Depends(get_db),
 ) -> None:
     try:
