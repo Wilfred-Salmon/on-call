@@ -2,14 +2,22 @@ from contextlib import AbstractContextManager
 
 import pandas as pd
 import numpy as np
-from typing import Any, Callable, Hashable, TypedDict
+from typing import Any, Protocol, Hashable, TypedDict
 
 from src.db.db import DB
 from src.rota.rotas import Snapshot_with_usernames
 from datetime import date
 
 type DBSpecification = dict[str, list[Snapshot_with_usernames]]
-type DBFactory = Callable[[DBSpecification], AbstractContextManager[DB]]
+
+
+class DBFactory(Protocol):
+    def __call__(
+        self,
+        db_specification: DBSpecification,
+        user_table: dict[str, int] | None = None,
+        rota_table: dict[str, int] | None = None,
+    ) -> AbstractContextManager[DB]: ...
 
 
 class RawSnapshot(TypedDict):
@@ -59,7 +67,7 @@ def parse_datetime_columns(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def construct_default_user_table(user_names_list: list[str]) -> dict[str, int]:
-    return {user_name: i for i, user_name in enumerate(set(user_names_list))}
+    return {user_name: i for i, user_name in enumerate(user_names_list)}
 
 
 def snapshot_tables_from_specification(

@@ -168,13 +168,45 @@ def add_user_to_rota_on_date(user_id: int, rota_id: int, date: date, db: DB) -> 
         )
 
     latest_snapshot = _get_last_rota_snapshot_before_date(rota_id, date, db.get_db())
-    new_user_list = _get_new_user_list(user_id, date, latest_snapshot)
+    new_user_list = _get_new_user_list_with_addition(user_id, date, latest_snapshot)
 
     _add_new_rota_snapshot_to_db(rota_id, new_user_list, date, db.get_db())
     db.write_tables_to_csv(["change_dates", "rota_snapshots"])
 
 
-def _get_new_user_list(
+def remove_user_from_rota_on_date(
+    user_id: int, rota_id: int, date: date, db: DB
+) -> None:
+    date = get_first_monday_before_date(date)
+    if _snapshots_exist_on_or_after_date(rota_id, date, db.get_db()):
+        raise ValueError(
+            f"Cannot remove user on {date} from rota {rota_id}, as there are changes after that date"
+        )
+
+    latest_snapshot = _get_last_rota_snapshot_before_date(rota_id, date, db.get_db())
+    if latest_snapshot is None or user_id not in latest_snapshot["user_list"]:
+        raise ValueError(
+            f"Cannot remove user {user_id} from rota {rota_id} on {date}, as they are not on the rota at that time"
+        )
+
+    new_user_list = _get_new_user_list_with_removal(user_id, date, latest_snapshot)
+
+    _add_new_rota_snapshot_to_db(rota_id, new_user_list, date, db.get_db())
+    db.write_tables_to_csv(["change_dates", "rota_snapshots"])
+
+
+def _get_new_user_list_with_removal(
+    user_id: int, date: date, latest_snapshot: _Snapshot_with_user_ids
+) -> list[int]:
+
+    latest_snaphost_valid_on = latest_snapshot["date"]
+    offset = (date - latest_snaphost_valid_on).days // 7
+
+    latest_snapshot_user_list = latest_snapshot["user_list"]
+    return [id for id in cycle_list(latest_snapshot_user_list, offset) if id != user_id]
+
+
+def _get_new_user_list_with_addition(
     user_id: int, date: date, latest_snapshot: _Snapshot_with_user_ids | None
 ) -> list[int]:
     if latest_snapshot is None or len(latest_snapshot["user_list"]) == 0:

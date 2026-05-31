@@ -2,7 +2,12 @@ from collections.abc import AsyncGenerator
 
 from fastapi import FastAPI, Depends, HTTPException
 from contextlib import asynccontextmanager
-from src.rota.rotas import add_user_to_rota_on_date, get_rota_between, Rota_Assignment
+from src.rota.rotas import (
+    add_user_to_rota_on_date,
+    get_rota_between,
+    remove_user_from_rota_on_date,
+    Rota_Assignment,
+)
 from src.db.db import DB, DEFAULT_TABLE_SCHEMA
 from datetime import date
 
@@ -40,7 +45,7 @@ def get_rota_between_(
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@app.post("/rota")
+@app.post("/rota/add_user")
 def add_user_to_rota_(
     user_id: int,
     rota_id: int,
@@ -49,5 +54,18 @@ def add_user_to_rota_(
 ) -> None:
     try:
         add_user_to_rota_on_date(user_id, rota_id, date, db)
+    except ValueError as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/rota/remove_user")
+def remove_user_from_rota(
+    user_id: int,
+    rota_id: int,
+    date: date,
+    db: DB = Depends(get_db),
+) -> None:
+    try:
+        remove_user_from_rota_on_date(user_id, rota_id, date, db)
     except ValueError as e:
         raise HTTPException(status_code=500, detail=str(e))

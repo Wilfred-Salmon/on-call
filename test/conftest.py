@@ -90,15 +90,19 @@ def _write_db_tables(
 
 
 def _get_user_names(db_specification: DBSpecification) -> list[str]:
-    user_names_list = [
-        user_name
-        for user_list in [
-            snapshot["user_list"]
-            for snaphot_list in db_specification.values()
-            for snapshot in snaphot_list
-        ]
-        for user_name in user_list
-    ]
+    user_names_list = list(
+        set(
+            [
+                user_name
+                for user_list in [
+                    snapshot["user_list"]
+                    for snaphot_list in db_specification.values()
+                    for snapshot in snaphot_list
+                ]
+                for user_name in user_list
+            ]
+        )
+    )
 
     return user_names_list
 
@@ -120,11 +124,15 @@ def fresh_db(tmp_path: Path) -> Generator[DB]:
 
 
 @pytest.fixture()
-def custom_db(
-    tmp_path: Path,
-) -> DBFactory:
+def custom_db(tmp_path: Path) -> DBFactory:
     @contextmanager
-    def _custom_db(db_specification: DBSpecification) -> Generator[DB]:
-        yield from fresh_db_with_rotas(tmp_path, db_specification)
+    def _custom_db(
+        db_specification: DBSpecification,
+        user_table: dict[str, int] | None = None,
+        rota_table: dict[str, int] | None = None,
+    ) -> Generator[DB]:
+        yield from fresh_db_with_rotas(
+            tmp_path, db_specification, user_table, rota_table
+        )
 
     return _custom_db
