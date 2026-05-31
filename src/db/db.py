@@ -12,8 +12,11 @@ class SQL_TYPES(Enum):
 type DBSchema = dict[str, dict[str, SQL_TYPES]]
 
 DEFAULT_TABLE_SCHEMA = {
-    "users": {"name": SQL_TYPES.STRING, "user_id": SQL_TYPES.INTEGER},
-    "rota_names": {"name": SQL_TYPES.STRING, "rota_id": SQL_TYPES.INTEGER},
+    "users": {
+        "user_id": SQL_TYPES.INTEGER,
+        "name": SQL_TYPES.STRING,
+    },
+    "rota_names": {"rota_id": SQL_TYPES.INTEGER, "name": SQL_TYPES.STRING},
     "change_dates": {
         "rota_id": SQL_TYPES.INTEGER,
         "date": SQL_TYPES.DATE,

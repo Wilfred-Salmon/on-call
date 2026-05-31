@@ -47,7 +47,7 @@ def fresh_db_with_rotas(
 ) -> Generator[DB]:
     if user_table is None:
         user_names_list = sorted(_get_user_names(db_specification))
-        user_table = user_table or construct_default_user_table(user_names_list)
+        user_table = construct_default_user_table(user_names_list)
     rota_table = rota_table or construct_default_rota_table(db_specification)
 
     change_dates, rota_snapshots = snapshot_tables_from_specification(
@@ -78,12 +78,12 @@ def _write_db_tables(
     pd.DataFrame(rota_snapshots, columns=["snapshot_id", "user_id", "index"]).to_csv(
         path / "rota_snapshots.csv", index=False
     )
-    pd.DataFrame(list(user_table.items()), columns=["name", "user_id"]).to_csv(
-        path / "users.csv", index=False
-    )
-    pd.DataFrame(list(rota_table.items()), columns=["name", "rota_id"]).to_csv(
-        path / "rota_names.csv", index=False
-    )
+    pd.DataFrame(
+        [(id, name) for name, id in user_table.items()], columns=["user_id", "name"]
+    ).to_csv(path / "users.csv", index=False)
+    pd.DataFrame(
+        [(id, name) for name, id in rota_table.items()], columns=["rota_id", "name"]
+    ).to_csv(path / "rota_names.csv", index=False)
     pd.DataFrame([], columns=["user_id", "rota_id", "start_date", "duration"]).to_csv(
         path / "overrides.csv", index=False
     )
